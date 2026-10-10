@@ -3,7 +3,7 @@ Import ZooSpec + PhotoObjDR7 from SciServer CasJobs into a local CSV.
 
 1. Prompt for SciServer credentials and authenticate.
 2. Build MyDB.ZooSpecPhoto with the JOIN in 'DR19'.
-3. Download the table to CSV in chunks, with progress output.
+3. Download the table to CSV in chunks.
 """
 
 import os
@@ -24,7 +24,7 @@ READY, STARTED, CANCELING, CANCELLED, FAILED, FINISHED = range(6)
 USERNAME = input("SciServer username: ").strip()
 PASSWORD = getpass.getpass("SciServer password: ")
 
-print("Authenticating...", flush=True)
+print("Authenticating", flush=True)
 try:
     token = Authentication.login(USERNAME, PASSWORD)
 except Exception as e:
@@ -33,8 +33,8 @@ except Exception as e:
         raise SystemExit("Wrong username or password.")
     raise
 if not token:
-    raise SystemExit("Authentication failed!")
-print("Authentication successful.", flush=True)
+    raise SystemExit("Authentication failed")
+print("Authentication successful", flush=True)
 
 
 def query(sql, context="MyDB"):
@@ -106,7 +106,7 @@ def fetch_page(last_key, rows, retries=4):
         except Exception as e:
             print(f"  Page failed (attempt {attempt}/{retries}): {str(e)[:120]}", flush=True)
             time.sleep(5 * attempt)
-    raise SystemExit("Giving up on this page. Try a smaller CHUNK_ROWS.")
+    raise SystemExit("Try a smaller CHUNK_ROWS.")
 
 if os.path.exists(OUTPUT_CSV):
     os.remove(OUTPUT_CSV)

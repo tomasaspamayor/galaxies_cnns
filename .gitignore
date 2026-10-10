@@ -6,6 +6,7 @@ __pycache__/
 # C extensions and CSVs
 *.so
 *.csv
+*.png
 
 # Distribution / packaging
 .Python

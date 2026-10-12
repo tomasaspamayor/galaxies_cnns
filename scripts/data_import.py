@@ -14,7 +14,7 @@ from SciServer import Authentication, CasJobs
 # Configurations
 CONTEXT = "DR19"
 TABLE_NAME = "ZooSpecPhoto"
-OUTPUT_CSV = "ZooSpecPhoto.csv"
+OUTPUT_CSV = "datasets/ZooSpecPhoto.csv"
 CHUNK_ROWS = 20000
 EXPECTED_ROWS = 659272
 

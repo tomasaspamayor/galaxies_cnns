@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 0001 · The Three Trees — How Git Actually Thinks</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Git for your research project · Lesson 0001</p>
+  <h1>The Three Trees: how Git actually thinks</h1>
+  <p class="subtitle">One mental model that makes every other Git command predictable.</p>
+
+  <div class="meta">
+    <span>~12 minutes</span>
+    <span>Skill: control exactly what goes into a commit</span>
+    <span>Prerequisite: <code>add</code> · <code>commit</code></span>
+  </div>
+
+  <div class="callout callout--mission">
+    <span class="label">Why this, for your project</span>
+    <p>You want to manage your galaxies analysis confidently. The reason Git feels
+    mysterious is that most people never learn <em>where</em> their changes live.
+    Once you can picture the three places a change can sit, "what will
+    <code>git commit</code> actually record?" stops being a guess — and your
+    experiment history stays trustworthy.</p>
+  </div>
+
+  <h2>Git keeps three copies of your project</h2>
+  <p>This is the whole idea. A working Git repository is really three separate
+  places your files can exist:</p>
+
+  <div class="trees">
+    <div class="tree tree--working">
+      <h4>Working tree</h4>
+      <p class="role">The files you actually edit — your <code>analysis.py</code>,
+      your notebook, your data. Just a normal folder.</p>
+    </div>
+    <div class="tree tree--staged">
+      <h4>Staging area</h4>
+      <p class="role">A holding pen for the next commit. Its technical name is the
+      <strong>index</strong>. This is where you choose what to record.</p>
+    </div>
+    <div class="tree tree--committed">
+      <h4>Git directory</h4>
+      <p class="role">The permanent database of snapshots — the <code>.git</code>
+      folder. Committed work lives here forever.</p>
+    </div>
+  </div>
+  <p class="flow">edit a file &nbsp;→&nbsp; <code>git add</code> &nbsp;→&nbsp; staging area &nbsp;→&nbsp; <code>git commit</code> &nbsp;→&nbsp; git directory</p>
+
+  <p>Every file in your project is in one of three <strong>states</strong>, named
+  after those places <a href="https://git-scm.com/book/en/v2/Getting-Started-What-is-Git%3F">(Pro Git §1.3)</a>:</p>
+  <ul>
+    <li><strong>Modified</strong> — you changed it in the working tree, Git hasn't
+    recorded it yet.</li>
+    <li><strong>Staged</strong> — you marked <em>this exact version</em> to go into
+    the next commit.</li>
+    <li><strong>Committed</strong> — it is safely in the git directory.</li>
+  </ul>
+
+  <div class="callout callout--warn">
+    <span class="label">The key misconception</span>
+    <p><code>git add</code> does <strong>not</strong> "add a file to the project".
+    It copies the file's <em>current content</em> into the staging area. If you
+    edit the file again afterwards, the working tree has newer changes the staging
+    area doesn't know about — so the same file can be both staged <em>and</em>
+    modified. This trips up almost everyone at first.</p>
+  </div>
+
+  <p>And one more pointer you'll see constantly: <strong>HEAD</strong>. HEAD is just
+  a marker for "where you are right now" — normally the branch you're on, and
+  therefore the last commit you built on top of.</p>
+
+  <h2>Skill 1 · Read <code>git status</code> like a scientist</h2>
+  <p><code>git status</code> tells you which of the three places each change is in.
+  The full output is wordy; the short version is a precise two-column code. Run:</p>
+  <pre><code><span class="p">$</span> git status -s
+ M analysis.py
+M  results.csv
+MM notebook.ipynb
+?? raw_data/</code></pre>
+
+  <p>Read it as <strong>two columns</strong>: the <em>left</em> column is the staging
+  area, the <em>right</em> column is the working tree.</p>
+
+  <table>
+    <thead><tr><th>Code</th><th>Left (staged)</th><th>Right (working tree)</th><th>Meaning</th></tr></thead>
+    <tbody>
+      <tr><td><code> M</code></td><td>space</td><td>M</td><td>Modified, <strong>not staged</strong></td></tr>
+      <tr><td><code>M </code></td><td>M</td><td>space</td><td>Modified <strong>and staged</strong></td></tr>
+      <tr><td><code>MM</code></td><td>M</td><td>M</td><td>Staged, <em>then edited again</em></td></tr>
+      <tr><td><code>??</code></td><td>?</td><td>?</td><td>Untracked — Git has never seen it</td></tr>
+    </tbody>
+  </table>
+
+  <p>The blank space is information: it means "nothing here". So <code> M</code>
+  and <code>M </code> are different situations, and now you can tell them apart.</p>
+
+  <h2>Skill 2 · See the actual lines with <code>git diff</code></h2>
+  <p><code>git status</code> names files; <code>git diff</code> shows the exact lines
+  added and removed. There are two flavours, and beginners mix them up constantly:</p>
+  <pre><code><span class="c"># working tree  ⇄  staging area   (what you changed, not yet staged)</span>
+<span class="p">$</span> git diff
+
+<span class="c"># staging area  ⇄  last commit    (what will go into the next commit)</span>
+<span class="p">$</span> git diff --staged</code></pre>
+  <p>If you've staged everything and run plain <code>git diff</code>, it prints
+  <em>nothing</em> — because there's no unstaged change left. That empty output is
+  correct, not a bug.</p>
+
+  <h2>Skill 3 · Undo precisely, without losing work</h2>
+  <p>Because you now know the three places, you can move changes between them on
+  purpose. Two commands do almost all of it
+  <a href="https://git-scm.com/book/en/v2/Git-Basics-Undoing-Things">(Pro Git §2.4)</a>:</p>
+  <pre><code><span class="c"># Un-stage a file (move it back to the working tree). Your edits are KEPT.</span>
+<span class="p">$</span> git restore --staged analysis.py
+
+<span class="c"># DISCARD working-tree edits, reverting the file to the last commit.</span>
+<span class="c"># DANGEROUS: your unsaved edits to that file are gone for good.</span>
+<span class="p">$</span> git restore analysis.py</code></pre>
+
+  <div class="callout callout--tip">
+    <span class="label">Memory hook</span>
+    <p><code>--staged</code> means "reach into the staging area". Without it,
+    <code>restore</code> reaches into your <em>files</em>. Committed work is almost
+    always recoverable; uncommitted work that you <code>restore</code> away is not.</p>
+  </div>
+
+  <h2>Check yourself</h2>
+  <p>Click an answer on each question. You get feedback immediately — and only one
+  try, so answer from memory.</p>
+
+  <div class="quiz">
+    <p class="quiz-score" style="font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem;color:var(--ink-faint);"></p>
+
+    <div class="quiz-item" data-answer="0">
+      <p class="quiz-prompt"><span class="qno">Question 1</span>You edit <code>analysis.py</code> and run no Git command. Where does the change live?</p>
+      <button class="quiz-opt">In the working tree, only</button>
+      <button class="quiz-opt">In the staging area, only</button>
+      <button class="quiz-opt">In the git directory, now</button>
+      <p class="quiz-feedback"><strong>Why:</strong> Editing only touches the working
+      tree. Nothing reaches the staging area until you run <code>git add</code>.</p>
+    </div>
+
+    <div class="quiz-item" data-answer="2">
+      <p class="quiz-prompt"><span class="qno">Question 2</span><code>git status -s</code> shows <code>&nbsp;M&nbsp;analysis.py</code> (a space, then <code>M</code>). What is the state?</p>
+      <button class="quiz-opt">It is a staged change</button>
+      <button class="quiz-opt">It is a committed change</button>
+      <button class="quiz-opt">It is an unstaged change</button>
+      <p class="quiz-feedback"><strong>Why:</strong> The left column (staged) is blank;
+      the right column (working tree) shows <code>M</code>. It's modified but not staged.</p>
+    </div>
+
+    <div class="quiz-item" data-answer="1">
+      <p class="quiz-prompt"><span class="qno">Question 3</span>Which command shows the exact lines you changed that are <em>not yet staged</em>?</p>
+      <button class="quiz-opt"><code>git diff --staged</code> shows them</button>
+      <button class="quiz-opt"><code>git diff</code> by itself shows them</button>
+      <button class="quiz-opt"><code>git log --patch</code> shows them</button>
+      <p class="quiz-feedback"><strong>Why:</strong> Plain <code>git diff</code> compares
+      working tree to staging area. <code>--staged</code> compares staging area to the
+      last commit. <code>log</code> looks at history, not your pending edits.</p>
+    </div>
+
+    <div class="quiz-item" data-answer="2">
+      <p class="quiz-prompt"><span class="qno">Question 4</span>You staged <code>junk.py</code> by mistake but want to keep your edits on disk. What do you run?</p>
+      <button class="quiz-opt"><code>git restore junk.py</code></button>
+      <button class="quiz-opt"><code>git rm --cached junk.py</code></button>
+      <button class="quiz-opt"><code>git restore --staged junk.py</code></button>
+      <p class="quiz-feedback"><strong>Why:</strong> <code>--staged</code> un-stages
+      while keeping your edits. Bare <code>git restore junk.py</code> would
+      <em>delete</em> your edits.</p>
+    </div>
+
+    <div class="quiz-item" data-answer="0">
+      <p class="quiz-prompt"><span class="qno">Question 5</span>After <code>git commit</code> succeeds, where does that snapshot live?</p>
+      <button class="quiz-opt">In the git directory database</button>
+      <button class="quiz-opt">In the working tree folder</button>
+      <button class="quiz-opt">In the staging area index</button>
+      <p class="quiz-feedback"><strong>Why:</strong> A commit writes the staged
+      snapshot into the git directory, where it becomes permanent history.</p>
+    </div>
+  </div>
+
+  <h2>Practice on your own repo</h2>
+  <p>Do this in your <code>learn-git</code> or <code>galaxies_cnns</code> folder.
+  The point is to <em>predict</em> the result before running each command.</p>
+  <ol class="drill">
+    <li>Run <code>git status -s</code>. For each line, say out loud which column has
+    a letter, and what that means. <em>Predict first, then check.</em></li>
+    <li>Pick a tracked file you don't mind touching. Add a blank line, save, and run
+    <code>git status -s</code>. You should see <code>&nbsp;M</code> — unstaged.</li>
+    <li>Run <code>git diff</code>. Confirm your blank line is shown as an addition.
+    Then run <code>git diff --staged</code> and confirm it shows nothing.</li>
+    <li>Run <code>git add &lt;file&gt;</code>, then <code>git status -s</code>. The
+    code should flip to <code>M&nbsp;</code>. Run <code>git diff</code> (now empty)
+    and <code>git diff --staged</code> (now shows your line).</li>
+    <li>Undo the staging with <code>git restore --staged &lt;file&gt;</code>. Confirm
+    with <code>git status -s</code> that it's back to <code>&nbsp;M</code> and your
+    blank line is still in the file.</li>
+    <li>Discard the experiment for good: <code>git restore &lt;file&gt;</code>, then
+    <code>git status</code> — clean again.</li>
+  </ol>
+
+  <div class="primary-source">
+    <span class="label">Read this next (the primary source)</span>
+    <p><strong>Pro Git, chapter 2.2 — “Recording Changes to the Repository”.</strong>
+    This is the canonical, free book maintained by the Git project itself. Read the
+    sections “Checking the Status of Your Files”, “Short Status”, and
+    “Viewing Your Staged and Unstaged Changes”.</p>
+    <p style="margin-bottom:0"><a href="https://git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository">git-scm.com/book/en/v2/Git-Basics-Recording-Changes-to-the-Repository →</a></p>
+  </div>
+
+  <div class="ask">
+    <span class="label">Your teacher is right here.</span>
+    Stuck on any command, or want to see what it does on <em>your</em> actual
+    repository before you run it? Ask me — paste the output and we'll read it
+    together. That interactive back-and-forth is where this really sticks.
+  </div>
+
+  <div class="lesson-nav">
+    <span><a href="../reference/git-cheatsheet.html">Reference · Git command cheat sheet</a></span>
+    <span><a href="0002-branches-are-pointers.html">Next: Lesson 0002 · Branches are just pointers →</a></span>
+  </div>
+
+  <footer class="colophon">
+    Lesson 0001 · Git teaching workspace · built from Pro Git (2nd ed.), CC-BY-SA 3.0.
+  </footer>
+
+</div>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

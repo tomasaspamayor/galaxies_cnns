@@ -219,3 +219,6 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 ZooSpecPhoto.csv
+
+# External SciServer repository cloned for dependency installation
+/SciScript-Python/

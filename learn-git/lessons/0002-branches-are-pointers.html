@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 0002 · Branches Are Just Pointers</title>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Git for your research project · Lesson 0002</p>
+  <h1>Branches are just pointers</h1>
+  <p class="subtitle">Try a risky idea, keep the good one, and never touch your working version.</p>
+
+  <div class="meta">
+    <span>~15 minutes</span>
+    <span>Skill: isolate an experiment, then merge it back</span>
+    <span>Builds on Lesson 0001</span>
+  </div>
+
+  <div class="callout callout--mission">
+    <span class="label">Why this, for your project</span>
+    <p>You want to try a new model architecture or a different data-cleaning step
+    <em>without</em> risking the analysis that already works. That is exactly what
+    branching is for. Once you see that a branch is a disposable pointer, "let me
+    just try this" stops being scary.</p>
+  </div>
+
+  <h2>A branch is a label on a commit</h2>
+  <p>In Lesson 0001 you learned that a <strong>commit</strong> is a snapshot, and
+  that each commit points back to its parent. So your history is a chain:</p>
+  <pre><code>C0 ◄── C1 ◄── C2        <span class="c"># each commit points to its parent</span></code></pre>
+  <p>A <strong>branch</strong> is nothing more than a <em>movable pointer</em> to one
+  of those commits — a 41-byte file holding a commit's hash
+  <a href="https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell">(Pro Git §3.1)</a>.
+  When you commit, the branch you're on slides forward to the new commit. That's it.
+  There is no "copy of the project" anywhere.</p>
+
+  <div class="trees">
+    <div class="tree tree--committed">
+      <h4>Branch</h4>
+      <p class="role">A movable pointer that follows you as you commit.</p>
+    </div>
+    <div class="tree tree--working">
+      <h4>Tag</h4>
+      <p class="role">A fixed label that never moves (Lesson 0004).</p>
+    </div>
+    <div class="tree tree--staged">
+      <h4>HEAD</h4>
+      <p class="role">A pointer to the branch you are currently on.</p>
+    </div>
+  </div>
+
+  <p><strong>HEAD</strong> is the answer to "where am I?". It normally points at a
+  branch, not at a commit directly. When HEAD moves, your working tree changes to
+  match — which is the next key idea.</p>
+
+  <div class="callout callout--warn">
+    <span class="label">The surprising part</span>
+    <p>Switching branches <strong>rewrites your files</strong>. Git adds, removes, and
+    modifies files so your working tree matches the branch you switched to
+    <a href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">(Pro Git §3.2)</a>.
+    If you have uncommitted changes that would be clobbered, Git refuses the switch
+    to protect you. Commit or stash first.</p>
+  </div>
+
+  <h2>The commands</h2>
+  <pre><code><span class="c"># create a branch AND switch to it</span>
+<span class="p">$</span> git switch -c experiment
+
+<span class="c"># list branches (the star marks your current one)</span>
+<span class="p">$</span> git branch
+
+<span class="c"># move between branches</span>
+<span class="p">$</span> git switch main
+<span class="p">$</span> git switch -            <span class="c"># jump back to the previous branch</span>
+
+<span class="c"># see the shape of history as a graph</span>
+<span class="p">$</span> git log --oneline --graph --all</code></pre>
+  <p><code>git checkout -b x</code> is the older spelling of <code>git switch -c x</code>.
+  You'll meet both in the wild.</p>
+
+  <h2>Divergence: two lines from one point</h2>
+  <p>Branch, commit on the branch, switch back, and commit again — now history has
+  <strong>diverged</strong>. Both lines share a common ancestor commit:</p>
+  <pre><code>              ┌── C3 ◄── experiment
+C0 ◄── C1 ◄── C2
+              └── C4 ◄── main</code></pre>
+  <p>Nothing on <code>experiment</code> has touched <code>main</code>. You can switch
+  between them freely; your working files follow. This is the whole safety mechanism.</p>
+
+  <h2>Bringing work back: merge</h2>
+  <p><code>git merge &lt;branch&gt;</code> combines another branch into the one you're
+  on. Git picks one of two modes:</p>
+  <table>
+    <thead><tr><th>Mode</th><th>When</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Fast-forward</strong></td><td>Your branch is a direct ancestor of the other</td><td>Pointer slides forward. No new commit.</td></tr>
+      <tr><td><strong>Three-way merge</strong></td><td>Both branches have diverged</td><td>A new <strong>merge commit</strong> with <em>two</em> parents.</td></tr>
+    </tbody>
+  </table>
+  <pre><code><span class="p">$</span> git switch main
+<span class="p">$</span> git merge experiment</code></pre>
+
+  <h2>When both sides touch the same line</h2>
+  <p>If the two branches changed the same lines, Git can't guess and stops with a
+  <strong>merge conflict</strong>. It writes markers into the file:</p>
+  <pre><code>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+your current branch's version
+=======
+the incoming branch's version
+&gt;&gt;&gt;&gt;&gt;&gt;&gt; experiment</code></pre>
+  <p>To resolve: edit the file to the result you actually want, delete the three
+  marker lines, then <code>git add</code> the file (staging marks it resolved) and
+  <code>git commit</code>. To abandon the merge entirely, run <code>git merge
+  --abort</code>.</p>
+
+  <h2>Try it: a live commit graph</h2>
+  <p>Below is a replayable sandbox. Buttons show the equivalent Git command. Follow
+  the guided steps underneath and <em>predict what moves before you click</em>.</p>
+
+  <div class="gitgraph" data-gitgraph>
+    <div class="gg-controls">
+      <input data-msg placeholder="commit message…">
+      <button data-act="commit">git commit</button>
+      <input data-name value="experiment" aria-label="new branch name">
+      <button data-act="branch">git switch -c</button>
+      <select data-switch aria-label="branch to switch to"></select>
+      <button data-act="switch">git switch</button>
+      <select data-merge aria-label="branch to merge"></select>
+      <button data-act="merge">git merge</button>
+      <select data-delete aria-label="branch to delete"></select>
+      <button data-act="delete">git branch -d</button>
+      <button data-act="reset" class="gg-reset">reset</button>
+    </div>
+    <svg width="560" height="260" role="img" aria-label="Interactive commit graph"></svg>
+    <p class="gg-status" data-status></p>
+    <pre class="gg-log" data-log></pre>
+  </div>
+
+  <h3>Guided steps (do them in order)</h3>
+  <ol class="drill">
+    <li>Type <code>add smoothing</code> as the message, click <strong>git switch -c</strong>.
+    <em>Predict:</em> does <code>main</code> move? Does a commit appear? Now click
+    <strong>git commit</strong>. Watch which pointer moves.</li>
+    <li>Click <strong>git commit</strong> again with a new message. Note the branch
+    label riding forward — that's the pointer following your commits.</li>
+    <li>Switch back to <code>main</code>. <em>Predict:</em> where does
+    <code>main</code> point, and where does <code>experiment</code> point?</li>
+    <li>With message <code>fix typo</code>, click <strong>git commit</strong>. History
+    has now <strong>diverged</strong> — two lines from one ancestor.</li>
+    <li>Merge <code>experiment</code> into <code>main</code>. Because both sides moved,
+    you should get a <strong>merge commit</strong> with two parents (read the log line).</li>
+    <li>Delete the branch: <strong>git branch -d</strong>. Notice the commits stay on
+    screen — deleting a branch deletes a <em>label</em>, not history.</li>
+    <li>Now see a <strong>fast-forward</strong>: click <strong>reset</strong>, make
+    <code>experiment</code>, commit once, switch to <code>main</code>, and merge
+    <em>without</em> committing on main first. Read the log: "fast-forward".</li>
+  </ol>
+
+  <h2>Check yourself</h2>
+  <p>One attempt per question — answer from memory.</p>
+
+  <div class="quiz">
+    <p class="quiz-score" style="font-family:ui-sans-serif,system-ui,sans-serif;font-size:.8rem;color:var(--ink-faint);"></p>
+
+    <div class="quiz-item" data-answer="0">
+      <p class="quiz-prompt"><span class="qno">Question 1</span>What is a branch, really?</p>
+      <button class="quiz-opt">A movable pointer to a commit</button>
+      <button class="quiz-opt">A full copy of all your files</button>
+      <button class="quiz-opt">A saved snapshot of the index</button>
+      <p class="quiz-feedback"><strong>Why:</strong> A branch is just a reference to one
+      commit. That is why creating one is instantaneous and costs almost nothing.</p>
+    </div>
+
+    <div class="quiz-item" data-answer="1">
+      <p class="quiz-prompt"><span class="qno">Question 2</span>You run <code>git switch -c experiment</code> and make a commit. Where does <code>main</code> point now?</p>
+      <button class="quiz-opt">At experiment's newest commit, moved along</button>
+      <button class="quiz-opt">At the same commit it had before</button>
+      <button class="quiz-opt">At the working tree's last saved state</button>
+      <p class="quiz-feedback"><strong>Why:</strong> Committing moves only the branch you
+      are <em>on</em> (experiment). <code>main</code> stays put until you merge.</p>
+    </div>
+
+    <div class="quiz-item" data-answer="2">
+      <p class="quiz-prompt"><span class="qno">Question 3</span>When does a merge produce <em>no</em> new commit (a fast-forward)?</p>
+      <button class="quiz-opt">When both branches changed the same lines</button>
+      <button class="quiz-opt">When the working tree has uncommitted edits</button>
+      <button class="quiz-opt">When one branch simply extends the other</button>
+      <p class="quiz-feedback"><strong>Why:</strong> With no divergence there is nothing to
+      combine, so Git just slides the pointer forward.</p>
+    </div>
+
+    <div class="quiz-item" data-answer="1">
+      <p class="quiz-prompt"><span class="qno">Question 4</span>In a conflict, the text written <em>above</em> the <code>=======</code> line is whose version?</p>
+      <button class="quiz-opt">It is the incoming branch's version</button>
+      <button class="quiz-opt">It is the current branch's version</button>
+      <button class="quiz-opt">It is the common ancestor's version</button>
+      <p class="quiz-feedback"><strong>Why:</strong> The top block is what <code>HEAD</code>
+      (the branch you're merging <em>into</em>) contains; the bottom block is the branch
+      being merged in.</p>
+    </div>
+
+    <div class="quiz-item" data-answer="0">
+      <p class="quiz-prompt"><span class="qno">Question 5</span>You've edited a conflicted file to the resolution you want. What next?</p>
+      <button class="quiz-opt">Stage it with git add, then commit</button>
+      <button class="quiz-opt">Run git merge again to retry it</button>
+      <button class="quiz-opt">Delete the branch and start over</button>
+      <p class="quiz-feedback"><strong>Why:</strong> <code>git add</code> marks the file as
+      resolved, then <code>git commit</code> finalises the merge commit.</p>
+    </div>
+  </div>
+
+  <h2>Practice on your own repo</h2>
+  <p>Use <code>learn-git</code>. Predict each result before running it.</p>
+  <ol class="drill">
+    <li>Run <code>git switch -c practice-branch</code>. Confirm with
+    <code>git branch</code> that you're on it (star). Run <code>git status</code> —
+    the working tree is unchanged.</li>
+    <li>Make a tiny edit to any file and commit it. Run
+    <code>git log --oneline --graph --all</code> — your branch is ahead.</li>
+    <li>Run <code>git switch -</code> to jump back. The file you edited reverts to how
+    <code>main</code> had it — proof that switching rewrites your files.</li>
+    <li>Merge it: <code>git switch &lt;original-branch&gt;</code> then
+    <code>git merge practice-branch</code>. It should <strong>fast-forward</strong>
+    (no commit made on the original branch in between).</li>
+    <li>Clean up: <code>git branch -d practice-branch</code>. History is preserved.</li>
+  </ol>
+
+  <div class="primary-source">
+    <span class="label">Read this next (the primary source)</span>
+    <p><strong>Pro Git, chapter 3.2 — “Basic Branching and Merging”.</strong> The
+    canonical walkthrough of the branch/hotfix workflow, fast-forward, three-way
+    merge, and conflict resolution. For the conceptual groundwork, read §3.1
+    "Branches in a Nutshell" first.</p>
+    <p style="margin-bottom:0"><a href="https://git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging">git-scm.com/book/en/v2/Git-Branching-Basic-Branching-and-Merging →</a></p>
+  </div>
+
+  <div class="ask">
+    <span class="label">Want to feel it, not just read it?</span>
+    <p>Try <a href="https://learngitbranching.js.org/">Learn Git Branching</a> — a
+    visual game that drills exactly these moves with instant feedback. And ask me to
+    walk your <em>real</em> branch structure: run
+    <code>git log --oneline --graph --all</code>, paste it, and we'll read it together.</p>
+  </div>
+
+  <div class="lesson-nav">
+    <span><a href="0001-the-three-trees.html">← Lesson 0001 · The three trees</a></span>
+    <span><a href="../reference/git-cheatsheet.html">Reference · cheat sheet</a></span>
+    <span>Next: Lesson 0003 — Stash →</span>
+  </div>
+
+  <footer class="colophon">
+    Lesson 0002 · Git teaching workspace · built from Pro Git (2nd ed.), CC-BY-SA 3.0.
+  </footer>
+
+</div>
+<script src="../assets/quiz.js"></script>
+<script src="../assets/gitgraph.js"></script>
+</body>
+</html>

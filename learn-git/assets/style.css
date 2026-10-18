@@ -1,0 +1,418 @@
+/* ==========================================================================
+   Git course — shared stylesheet
+   Tufte-inspired: serif body, generous measure, quiet colour, print-friendly.
+   Every lesson and reference document links this file.
+   ========================================================================== */
+
+:root {
+  --ink:        #1a1a1a;
+  --ink-soft:   #4a4a4a;
+  --ink-faint:  #767676;
+  --paper:      #fdfcf9;
+  --rule:       #e2ddd2;
+  --rule-soft:  #efeae0;
+
+  --accent:     #8a3324;   /* oxblood — headers, links, emphasis */
+  --accent-soft:#f3e7e2;
+  --working:    #2f6b4f;   /* working tree  — green  */
+  --staged:     #9a6a1a;   /* index         — amber  */
+  --committed:  #33557f;   /* repository    — blue   */
+  --ok:         #2f6b4f;
+  --bad:        #a23b2a;
+  --code-bg:    #f5f2ea;
+
+  --measure:    42rem;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
+               "Times New Roman", serif;
+  font-size: 1.075rem;
+  line-height: 1.62;
+  text-rendering: optimizeLegibility;
+}
+
+.wrap {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 5rem;
+}
+
+/* ---------- Masthead ---------- */
+
+.kicker {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 0.6rem;
+}
+
+h1 {
+  font-size: 2.05rem;
+  line-height: 1.18;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  font-size: 1.12rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin: 0 0 1.6rem;
+}
+
+.meta {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 0.55rem 0;
+  margin: 1.6rem 0 2.4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+}
+.meta span { white-space: nowrap; }
+
+/* ---------- Headings & text ---------- */
+
+h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 2.8rem 0 0.8rem;
+  letter-spacing: -0.005em;
+}
+h2::before {
+  content: "";
+  display: block;
+  width: 2.2rem;
+  height: 2px;
+  background: var(--accent);
+  margin-bottom: 0.7rem;
+}
+
+h3 { font-size: 1.05rem; font-weight: 600; margin: 1.8rem 0 0.5rem; }
+
+p { margin: 0 0 1rem; }
+
+a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(138,51,36,0.35); }
+a:hover { border-bottom-color: var(--accent); }
+
+strong { font-weight: 600; }
+em { font-style: italic; }
+
+ul, ol { padding-left: 1.3rem; margin: 0 0 1rem; }
+li { margin: 0.3rem 0; }
+
+hr { border: none; border-top: 1px solid var(--rule); margin: 2.5rem 0; }
+
+/* ---------- Inline & block code ---------- */
+
+code, .term {
+  font-family: "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.86em;
+  background: var(--code-bg);
+  border: 1px solid var(--rule-soft);
+  border-radius: 3px;
+  padding: 0.08em 0.35em;
+}
+
+pre {
+  background: #2b2b28;
+  color: #f3f0e8;
+  border-radius: 5px;
+  padding: 0.95rem 1.1rem;
+  overflow-x: auto;
+  font-family: "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.83rem;
+  line-height: 1.55;
+  margin: 0 0 1.1rem;
+  border: 1px solid #1f1f1c;
+}
+pre code { background: none; border: none; padding: 0; font-size: 1em; color: inherit; }
+pre .c { color: #9a9a8f; }   /* comment */
+pre .p { color: #e0b060; }   /* prompt / highlight */
+pre .g { color: #7fc79b; }   /* added / good */
+pre .r { color: #e0897a; }   /* removed */
+
+/* ---------- Callouts ---------- */
+
+.callout {
+  border-left: 3px solid var(--rule);
+  background: #faf7f0;
+  padding: 0.85rem 1.1rem;
+  margin: 1.3rem 0;
+  border-radius: 0 4px 4px 0;
+}
+.callout p:last-child { margin-bottom: 0; }
+.callout .label {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.35rem;
+}
+.callout--mission { border-left-color: var(--accent); background: var(--accent-soft); }
+.callout--mission .label { color: var(--accent); }
+.callout--tip { border-left-color: var(--working); background: #eef4f0; }
+.callout--tip .label { color: var(--working); }
+.callout--warn { border-left-color: var(--staged); background: #f8f1e4; }
+.callout--warn .label { color: var(--staged); }
+
+/* ---------- Three-trees diagram ---------- */
+
+.trees {
+  display: flex;
+  gap: 0.6rem;
+  margin: 1.4rem 0 1.6rem;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+.tree {
+  flex: 1 1 0;
+  min-width: 9rem;
+  border: 1px solid var(--rule);
+  border-top-width: 4px;
+  border-radius: 5px;
+  background: #fffefb;
+  padding: 0.8rem 0.85rem;
+}
+.tree h4 {
+  margin: 0 0 0.3rem;
+  font-size: 0.95rem;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+.tree .role {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.74rem;
+  color: var(--ink-faint);
+  line-height: 1.4;
+}
+.tree--working  { border-top-color: var(--working); }
+.tree--staged   { border-top-color: var(--staged); }
+.tree--committed{ border-top-color: var(--committed); }
+.tree--working h4  { color: var(--working); }
+.tree--staged h4   { color: var(--staged); }
+.tree--committed h4{ color: var(--committed); }
+
+.flow {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  text-align: center;
+  margin: -0.6rem 0 1.6rem;
+}
+
+/* ---------- Status-code legend table ---------- */
+
+table { border-collapse: collapse; width: 100%; margin: 0 0 1.2rem; font-size: 0.92rem; }
+th, td { text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--rule-soft); }
+th { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 0.74rem;
+     text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); }
+td code { font-size: 0.85em; }
+.two-col { column-count: 1; }
+
+/* ---------- Drill / practice steps ---------- */
+
+.drill { counter-reset: step; list-style: none; padding-left: 0; }
+.drill > li {
+  position: relative;
+  padding-left: 2.4rem;
+  margin: 0 0 0.9rem;
+}
+.drill > li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 0; top: 0.05rem;
+  width: 1.6rem; height: 1.6rem;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+
+/* ---------- Quiz widget ---------- */
+
+.quiz { margin: 1.2rem 0 0.5rem; }
+.quiz-item {
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 1rem 1.1rem 0.9rem;
+  margin: 0 0 1rem;
+  background: #fffefb;
+}
+.quiz-prompt { font-weight: 600; margin: 0 0 0.75rem; }
+.quiz-prompt .qno {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.72rem; color: var(--ink-faint);
+  letter-spacing: 0.08em; display: block; margin-bottom: 0.15rem;
+  text-transform: uppercase;
+}
+.quiz-opt {
+  display: block; width: 100%; text-align: left;
+  font: inherit; font-size: 0.95rem;
+  background: #fbfaf6; color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 0.55rem 0.8rem;
+  margin: 0 0 0.45rem;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.quiz-opt:hover { background: #f3f0e7; border-color: #cdc6b8; }
+.quiz-opt.correct  { background: #e5f1e9; border-color: var(--ok); font-weight: 600; }
+.quiz-opt.correct::after  { content: "  ✓"; color: var(--ok); }
+.quiz-opt.incorrect{ background: #f7e5e0; border-color: var(--bad); }
+.quiz-opt.incorrect::after{ content: "  ✕"; color: var(--bad); }
+.quiz-opt.muted    { opacity: 0.5; }
+.quiz-feedback {
+  display: none;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--rule);
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback strong { color: var(--ink); }
+[data-done] .quiz-opt { cursor: default; }
+
+/* ---------- Source / footer ---------- */
+
+.primary-source {
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: #fffefb;
+  padding: 1rem 1.1rem;
+  margin: 1.2rem 0;
+}
+.primary-source .label {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent); display: block; margin-bottom: 0.35rem;
+}
+
+.lesson-nav {
+  display: flex; justify-content: space-between; gap: 1rem;
+  margin-top: 3rem; padding-top: 1.2rem;
+  border-top: 1px solid var(--rule);
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.85rem;
+}
+
+.ask {
+  background: #f4f1e8;
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+  margin: 1.6rem 0;
+  font-size: 0.95rem;
+}
+.ask .label { font-weight: 700; }
+
+footer.colophon {
+  margin-top: 3rem;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+/* ---------- Commit-graph simulator (gitgraph.js) ---------- */
+
+.gitgraph {
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: #fffefb;
+  padding: 0.9rem 1rem 1rem;
+  margin: 1.4rem 0;
+}
+.gg-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
+  margin-bottom: 0.9rem;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8rem;
+}
+.gg-controls input,
+.gg-controls select {
+  font: inherit;
+  padding: 0.32rem 0.45rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: #fff;
+  color: var(--ink);
+}
+.gg-controls input { width: 8.5rem; }
+.gg-controls [data-name] { width: 7rem; color: var(--ink-soft); }
+.gg-controls button {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.34rem 0.6rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: #f4f1e8;
+  color: var(--ink);
+}
+.gg-controls button:hover { background: #ece7d9; }
+.gg-controls button[data-act="commit"] { background: #eef4f0; border-color: #bcd6c7; color: var(--working); }
+.gg-controls button[data-act="merge"]  { background: #e9eff7; border-color: #b9c9de; color: var(--committed); }
+.gg-controls button.gg-reset { background: #f3e7e2; border-color: #dcc0b6; color: var(--accent); }
+.gitgraph svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  background:
+    linear-gradient(0deg, transparent 0, transparent 100%),
+    repeating-linear-gradient(90deg, #f7f4ec 0 1px, transparent 1px 86px);
+  border: 1px solid var(--rule-soft);
+  border-radius: 5px;
+}
+.gg-status {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  margin: 0.6rem 0 0.4rem;
+}
+.gg-log {
+  margin: 0;
+  font-size: 0.76rem;
+  max-height: 8.5rem;
+  background: #2b2b28;
+}
+
+@media (max-width: 34rem) {
+  body { font-size: 1.02rem; }
+  .wrap { padding: 2.2rem 1.1rem 3.5rem; }
+  h1 { font-size: 1.7rem; }
+}
+
+@media print {
+  :root { --paper: #fff; }
+  body { font-size: 11pt; }
+  .wrap { max-width: none; padding: 0; }
+  .quiz-opt { border: 1px solid #999; }
+  a { border: none; }
+  pre { background: #f4f4f4; color: #111; border: 1px solid #ccc; }
+  .lesson-nav, .ask { display: none; }
+  .gg-controls, .gg-log { display: none; }
+  .gitgraph { background: #fff; }
+}
